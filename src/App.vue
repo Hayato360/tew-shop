@@ -10,14 +10,14 @@
     >
       <!-- Logo -->
       <div class="d-flex align-center">
-        <v-img
+        <!-- <v-img
           alt="Game Shop Logo"
           class="shrink mr-2"
           contain
           src="/img/icons/android-chrome-192x192.png"
           transition="scale-transition"
           width="40"
-        />
+        /> -->
         <v-toolbar-title class="app-title">
           🎮 GAME SHOP
         </v-toolbar-title>
@@ -62,6 +62,18 @@
         <v-btn v-if="isAdmin" text to="/users" class="gaming-nav-btn">
           <v-icon left>mdi-account-group</v-icon>
           จัดการผู้ใช้
+        </v-btn>
+        
+        <!-- Admin Only - Product Management -->
+        <v-btn v-if="isAdmin" text to="/admin/products" class="gaming-nav-btn">
+          <v-icon left>mdi-package-variant</v-icon>
+          จัดการสินค้า
+        </v-btn>
+        
+        <!-- Admin Only - Order Management -->
+        <v-btn v-if="isAdmin" text to="/admin/orders" class="gaming-nav-btn">
+          <v-icon left>mdi-clipboard-list</v-icon>
+          จัดการออเดอร์
         </v-btn>
       </template>
 
@@ -126,7 +138,21 @@
                 <v-list-item-icon>
                   <v-icon>mdi-account-group</v-icon>
                 </v-list-item-icon>
-                <v-list-item-title>User Management</v-list-item-title>
+                <v-list-item-title>จัดการผู้ใช้</v-list-item-title>
+              </v-list-item>
+
+              <v-list-item v-if="isAdmin" to="/admin/products">
+                <v-list-item-icon>
+                  <v-icon>mdi-package-variant</v-icon>
+                </v-list-item-icon>
+                <v-list-item-title>จัดการสินค้า</v-list-item-title>
+              </v-list-item>
+
+              <v-list-item v-if="isAdmin" to="/admin/orders">
+                <v-list-item-icon>
+                  <v-icon>mdi-clipboard-list</v-icon>
+                </v-list-item-icon>
+                <v-list-item-title>จัดการออเดอร์</v-list-item-title>
               </v-list-item>
 
               <v-divider />
@@ -253,12 +279,8 @@ export default {
   },
   computed: {
     ...mapGetters(['isLoading', 'getError']),
-    ...mapGetters('auth', ['isAuthenticated', 'currentUser']),
+    ...mapGetters('auth', ['isAuthenticated', 'currentUser', 'isAdmin']),
     ...mapGetters('cart', ['itemCount']),
-    
-    isAdmin() {
-      return this.currentUser?.role === 'admin'
-    },
     
     cartItemCount() {
       return this.itemCount
@@ -279,11 +301,16 @@ export default {
   },
   methods: {
     ...mapActions(['clearError']),
-    ...mapActions('auth', ['logout', 'checkAuth']),
+    ...mapActions('auth', ['logout', 'checkAuth', 'fetchProfile']),
     ...mapActions('cart', ['fetchCart']),
-
-    handleLogout() {
-      this.logout()
+    
+    async handleLogout() {
+      try {
+        await this.logout()
+        this.$router.push('/login')
+      } catch (error) {
+        console.error('Logout error:', error)
+      }
     }
   },
   
@@ -291,9 +318,14 @@ export default {
     // Check authentication status on app start
     this.checkAuth()
     
-    // Fetch cart if user is authenticated
+    // Fetch user profile and cart if user is authenticated
     if (this.isAuthenticated) {
-      await this.fetchCart()
+      try {
+        await this.fetchProfile()
+        await this.fetchCart()
+      } catch (error) {
+        console.error('Failed to fetch user data:', error)
+      }
     }
   },
   

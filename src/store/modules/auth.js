@@ -1,4 +1,5 @@
 import { authService } from '../../services/authService'
+import { userService } from '../../services/userService'
 
 const state = {
   user: null,
@@ -9,6 +10,7 @@ const state = {
 const getters = {
   currentUser: state => state.user,
   isAuthenticated: state => state.isAuthenticated,
+  isAdmin: state => state.user?.role === 'admin',
   getToken: state => state.token
 }
 
@@ -76,6 +78,17 @@ const actions = {
     const token = authService.getToken()
     if (token) {
       commit('SET_TOKEN', token)
+    }
+  },
+
+  async fetchProfile({ commit }) {
+    try {
+      const response = await userService.getMe()
+      commit('SET_USER', response.data)
+      return response.data
+    } catch (error) {
+      console.error('Failed to fetch profile:', error)
+      throw error
     }
   }
 }

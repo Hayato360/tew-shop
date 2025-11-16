@@ -4,8 +4,8 @@
     <v-row class="mb-6">
       <v-col cols="12">
         <div class="text-center mb-8">
-          <h1 class="gaming-title gradient-text">💻 Tech Store</h1>
-          <p class="subtitle-1 mt-2">เทคโนโลยีคุณภาพสูง พร้อมส่งถึงมือคุณ</p>
+          <h1 class="gaming-title">💻 Tech Store</h1>
+          <!-- <p class="subtitle-1 mt-2">เทคโนโลยีคุณภาพสูง พร้อมส่งถึงมือคุณ</p> -->
         </div>
       </v-col>
     </v-row>
@@ -87,6 +87,7 @@
         <v-card
           class="product-card gaming-card"
           elevation="2"
+          min-height="380px"
           @click="viewProductDetail(product)"
         >
           <!-- Product Image -->

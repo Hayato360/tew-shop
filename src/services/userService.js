@@ -1,6 +1,11 @@
 import apiClient from './api'
 
 export const userService = {
+  // Get current user profile
+  getMe() {
+    return apiClient.get('/users/me')
+  },
+
   // Get all users (Admin only)
   getAllUsers() {
     return apiClient.get('/users')
